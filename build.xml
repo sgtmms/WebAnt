@@ -10,8 +10,70 @@
 <project name="WebAnt" default="default" basedir=".">
     <description>Builds, tests, and runs the project WebAnt.</description>
     <import file="nbproject/build-impl.xml"/>
-    <!--
+    <exec executable="git" outputproperty="git.branch" failonerror="false">
+        <arg value="rev-parse"/>
+        <arg value="--abbrev-ref"/>
+        <arg value="HEAD"/>
+    </exec>
+    <loadresource property="git.context">
+        <propertyresource name="git.branch"/>
+        <filterchain>
+          <tokenfilter>
+            <filetokenizer/>
+            <replacestring from="/" to="-"/>
+          </tokenfilter>
+        </filterchain>
+    </loadresource>
+    <condition property="isExperimentalBranch" value="true" else="false">
+        <contains string="${git.branch}" substring="experimental/"/>
+    </condition> 
+    <condition property="isFeatureBranch" value="true" else="false">
+        <contains string="${git.branch}" substring="feature/"/>
+    </condition>  
+    <condition property="isDevelopBranch" value="true" else="false">
+        <contains string="${git.branch}" substring="develop"/>
+    </condition>
+    <condition property="isMainBranch" value="true" else="false">
+        <contains string="${git.branch}" substring="main"/>
+    </condition>
+    
+    
+    <echo message="Exp Branch: ${isExperimentalBranch}"/>
+    <echo message="Feature Branch: ${isFeatureBranch}"/>
+    <echo message="Develop Branch: ${isDevelopBranch}"/>
+    <echo message="Main Branch: ${isMainBranch}"/>
+    
+    <echo message="Git Branch: ${git.branch}"/>
+    
+    <echo message="Git Context: ${git.context}"/>  
+        <condition property="managedBranch" value="true">
+            <or>
+                <isTrue value="${isExperimentalBranch}"/>
+                <isTrue value="${isFeatureBranch}"/>
+                <isTrue value="${isDevelopBranch}"/>
+            </or>          
+        </condition>
+        <echo message="Managed: ${managedBranch}"/>
+        <condition property="mainBranch" value="true">
+            <or>
+                <isTrue value="${isMainBranch}"/>
+            </or>  
+        </condition>
+        <echo message="Main: ${mainBranch}"/>
+        
+    <target name="managed" if="${managedBranch}">
+        <echo message="Managed: ${git.context}" />
+    </target>
 
+    <target name="main" if="${mainBranch}">
+        <echo message="Main: ${mainBranch}" />
+    </target>
+    
+    <echo message="managedBranch: ${git.context}"/>
+    <!--    <manifest>
+        <attribute name="Build-Branch" value="${git.branch}"/>
+    </manifest>-->
+    <!--
     There exist several targets which are by default empty and which can be 
     used for execution of your tasks. These targets are usually executed 
     before and after some main targets. They are: 
