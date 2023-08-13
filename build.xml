@@ -15,11 +15,29 @@
         <arg value="--abbrev-ref"/>
         <arg value="HEAD"/>
     </exec>
+    <property name="branch" value="origin/feature/1234"/>
+    <condition property="long.branch" value="${branch}" >
+        <contains string="${branch}" substring="origin/"/>
+    </condition> 
+    <loadresource property="short.branch">
+        <propertyresource name="long.branch"/>
+        <filterchain>
+          <tokenfilter>
+            <replacestring from="origin/" to=""/>
+          </tokenfilter>
+        </filterchain>
+    </loadresource>
+    
+    <condition property="git.branch" value="${short.branch}">
+        <not>
+            <isset property="${git.branch}"/>
+        </not>
+    </condition>
+    
     <loadresource property="git.context">
         <propertyresource name="git.branch"/>
         <filterchain>
           <tokenfilter>
-            <filetokenizer/>
             <replacestring from="/" to="-"/>
           </tokenfilter>
         </filterchain>
